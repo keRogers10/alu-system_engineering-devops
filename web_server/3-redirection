@@ -1,8 +1,25 @@
 #!/usr/bin/env bash
-# Configure your Nginx server so that /redirect_me is redirecting to another page.
+# Configures an Nginx server so that /redirect_me redirects to another page.
+# The redirection is configured as a "301 Moved Permanently"
+
 apt-get update
-apt-get -y install nginx
-ufw allow 'Nginx HTTP'
-echo "Hoberlton School" > /var/www/html/index.nginx-debian.html
-sed -i '/listen 80 default_server/a rewrite ^/redirect_me https://intranet.aluswe.com/users/my_profile permanent;' /etc/nginx/sites-available/default
-service nginx start
+apt-get install -y nginx
+
+mkdir /etc/nginx/html
+touch /etc/nginx/html/index.html
+echo "Holberton School" > /etc/nginx/html/index.html
+printf %s "server {
+    listen 80;
+    listen [::]:80 default_server;
+    root   /etc/nginx/html;
+    index  index.html index.htm;
+
+    location / {
+	try_files \$uri \$uri/ =404;
+    }
+    location /redirect_me {
+        return 301 https://www.youtube.com/watch?v=7VAI73roXaY&list=PPSV;
+    }
+}" > /etc/nginx/sites-available/default
+
+service nginx restart
